@@ -1,0 +1,24 @@
+// app.use(express.static("public"));  //TODO This folder is not present in my dir
+
+// let db = new sqlite3.Database("aurigny_tracker.db", (err) => {
+//     if (err) {
+//         console.error(err.message);
+//         return;
+//     }
+//     console.log("Connected to SQLite database.");
+// });
+
+// var server = app.listen(port, () => {
+//     console.log(`Server running at http://localhost:${port}`);
+// });
+
+// const io = socketIo(server);
+
+
+// app.get("/", (req,res)=>
+// res.json({message:"docker"})
+// );
+
+// app.listen(port, () => console.log(`app listening on http://localhost:${port}`));
+
+

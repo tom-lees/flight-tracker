@@ -1,0 +1,25 @@
+{
+  "name": "flight-tracker-server",
+  "version": "1.0.0",
+  "description": "Server linking Guernsey flights database to React.ts flight tracker site.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "Flight",
+    "Tracker",
+    "Guernsey"
+  ],
+  "author": "TL",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
