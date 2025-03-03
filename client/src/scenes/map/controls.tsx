@@ -6,7 +6,6 @@
 // TODO ADD click controls and controls reset function
 
 import * as p5 from 'p5'
-import { toASCII } from 'punycode'
 
 const debug = (message: string) => {
     const debugOn: boolean = false
@@ -62,13 +61,19 @@ export default class Controls {
         let IM: number[][] | null
 
         function touchStarted(e: TouchEvent) {
-            if (!e.touches || e.touches.length !== 2) return
+            if (!e.touches || e.touches.length > 2 || e.touches.length < 1)
+                return
             initialTouches = e.touches
             M0 = controls.view.affineTranslation
         }
 
         function touchMoved(e: TouchEvent) {
-            if (!e.touches || e.touches.length !== 2 || !initialTouches) {
+            if (
+                !e.touches ||
+                e.touches.length > 2 ||
+                e.touches.length < 1 ||
+                !initialTouches
+            ) {
                 return
             }
             IM = inverseAffineMatrix(controls.view.affineTranslation)
@@ -84,9 +89,15 @@ export default class Controls {
                 midpoint(initialTouches)[0] +
                 (midpoint(initialTouches)[0] - midpoint(e.touches)[0])
 
+            // let translationX: number =
+            //     midpoint(e.touches)[0] - midpoint(initialTouches)[0]
+
             let translationY: number =
                 midpoint(initialTouches)[1] +
                 (midpoint(initialTouches)[1] - midpoint(e.touches)[1])
+
+            // let translationY: number =
+            //     midpoint(e.touches)[1] - midpoint(initialTouches)[1]
 
             translationX = translationX * IM[0][0] + IM[0][2]
             translationY = translationY * IM[0][0] + IM[1][2]
@@ -147,19 +158,17 @@ export default class Controls {
                 (t0.clientY + t1.clientY) / 2,
             ]
         }
-        // function midpoint(left: number, right: number) {
-        //     return (left + right) / 2
-        // }
+
         function distance(touches: TouchList) {
             let [t0, t1] = touches
             let dx = t0.clientX - t1.clientX
             let dy = t0.clientY - t1.clientY
             return Math.sqrt(dx * dx + dy * dy)
         }
-        // function distance(left: number, right: number) {
-        //     let dx = left - right
-        //     return Math.sqrt(dx * dx)
-        // }
+
+        //
+        //  Matrix Functions
+        //
 
         function multiplyMatrices(m1: number[][], m2: number[][]) {
             var result: number[][] = []
@@ -215,40 +224,4 @@ export default class Controls {
             touchEnded,
         }
     }
-
-    // static zoom(controls: ControlsType) {
-    //     function worldZoom(e: WheelEvent) {
-    //         console.log('wheel event')
-    //         let controlsViewX = controls.view.x
-    //         let controlsViewY = controls.view.y
-    //         let controlsZoom = controls.view.zoom
-    //         // deltaY would normally control scroll behaviour.  However here it is zoom.
-    //         const { x, y, deltaY } = e
-    //         const direction = deltaY > 0 ? -1 : 1
-    //         const factor = 0.75
-    //         let zoom = 1 * direction * factor
-
-    //         const wx = (x - controlsViewX) / (window.innerWidth * controlsZoom)
-    //         const wy = (y - controlsViewY) / (window.innerHeight * controlsZoom)
-    //         controlsViewX -= wx * window.innerWidth * zoom
-    //         controlsViewY -= wy * window.innerHeight * zoom
-
-    //         // Set minimum and maximum zoom levels
-    //         const minZoom = 0.5 // Minimum zoom level to avoid inversion
-    //         const maxZoom = 10 // Maximum zoom level to avoid excessive zoom
-    //         const newZoom = controlsZoom + zoom
-
-    //         // Only apply zoom if within the allowed range
-    //         if (newZoom >= minZoom && newZoom <= maxZoom) {
-    //             controls.view.zoom = newZoom
-    //             controls.view.x = controlsViewX
-    //             controls.view.y = controlsViewY
-    //         }
-    //     }
-    //     return { worldZoom }
-    // }
 }
-
-//   translate(-centrex*(_scale-1),
-//             -centrey*(_scale-1));
-//   scale(_scale);
