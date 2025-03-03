@@ -76,6 +76,20 @@ export default class Controls {
             ) {
                 return
             }
+            let translationX: number = 0
+            let translationY: number = 0
+            //
+            //  Single Finger Touch - Translate Controls
+            //
+            if (e.touches.length === 1) {
+                translationX =
+                    midpoint(initialTouches)[0] +
+                    (midpoint(e.touches)[0] - midpoint(initialTouches)[0])
+                translationY =
+                    midpoint(initialTouches)[1] +
+                    (midpoint(e.touches)[1] - midpoint(initialTouches)[1])
+            }
+
             IM = inverseAffineMatrix(controls.view.affineTranslation)
             if (!IM) return
             debug(`IM:
@@ -83,24 +97,18 @@ export default class Controls {
                 ${IM[1]}
                 ${IM[2]}`)
 
-            controls.view.scale = distance(e.touches) / distance(initialTouches)
+            // controls.view.scale = distance(e.touches) / distance(initialTouches)
 
-            let translationX: number =
-                midpoint(initialTouches)[0] +
-                (midpoint(initialTouches)[0] - midpoint(e.touches)[0])
+            // translationX =
+            //     midpoint(initialTouches)[0] +
+            //     (midpoint(initialTouches)[0] - midpoint(e.touches)[0])
 
-            // let translationX: number =
-            //     midpoint(e.touches)[0] - midpoint(initialTouches)[0]
+            // translationY =
+            //     midpoint(initialTouches)[1] +
+            //     (midpoint(initialTouches)[1] - midpoint(e.touches)[1])
 
-            let translationY: number =
-                midpoint(initialTouches)[1] +
-                (midpoint(initialTouches)[1] - midpoint(e.touches)[1])
-
-            // let translationY: number =
-            //     midpoint(e.touches)[1] - midpoint(initialTouches)[1]
-
-            translationX = translationX * IM[0][0] + IM[0][2]
-            translationY = translationY * IM[0][0] + IM[1][2]
+            // translationX = translationX * IM[0][0] + IM[0][2]
+            // translationY = translationY * IM[0][0] + IM[1][2]
 
             let T1: number[][] = [
                 [1, 0, translationX],
