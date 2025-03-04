@@ -6,9 +6,10 @@
 // TODO ADD click controls and controls reset function
 
 import * as p5 from 'p5'
+import { TouchList } from 'react'
 
 const debug = (message: string) => {
-    const debugOn: boolean = false
+    const debugOn: boolean = true
     if (debugOn) console.log(message)
 }
 
@@ -59,37 +60,54 @@ export default class Controls {
         let initialTouches: TouchList
         let M0: number[][]
         let IM: number[][] | null
+        let totalInitialTouches: number
 
         function touchStarted(e: TouchEvent) {
             if (!e.touches || e.touches.length > 2 || e.touches.length < 1)
                 return
-            initialTouches = e.touches
-            M0 = controls.view.affineTranslation
+            debug(`Touch Started`)
+            resetTouches(e)
         }
 
         function touchMoved(e: TouchEvent) {
+            debug(`Touch Moved`)
             if (
                 !e.touches ||
                 e.touches.length > 2 ||
                 e.touches.length < 1 ||
-                !initialTouches
+                !initialTouches ||
+                !totalInitialTouches
             ) {
                 return
             }
             let translationX: number = 0
             let translationY: number = 0
-            //
-            //  Single Finger Touch - Translate Controls
-            //
-            if (e.touches.length === 1) {
-                translationX =
-                    midpoint(initialTouches)[0] +
-                    (midpoint(e.touches)[0] - midpoint(initialTouches)[0])
-                translationY =
-                    midpoint(initialTouches)[1] +
-                    (midpoint(e.touches)[1] - midpoint(initialTouches)[1])
+
+            if (e.touches.length !== totalInitialTouches) {
+                debug(`Change in number of touches`)
+                resetTouches(e)
             }
 
+            if (e.touches.length === 1) {
+                //
+                //  Single Finger Touch - Translate Controls
+                //
+                debug(`One Touch`)
+                translationX = e.touches[0].clientX - initialTouches[0].clientX
+                translationY = e.touches[0].clientY - initialTouches[0].clientY
+
+                debug(`1 finger translation: (${translationX},${translationY})`)
+            }
+            //
+            //  Double Finger Touch - Translate Controls
+            //
+            if (e.touches.length === 2) {
+                debug(`Two Touch`)
+                translationX =
+                    midpoint(e.touches)[0] - midpoint(initialTouches)[0]
+                translationY =
+                    midpoint(e.touches)[1] - midpoint(initialTouches)[1]
+            }
             IM = inverseAffineMatrix(controls.view.affineTranslation)
             if (!IM) return
             debug(`IM:
@@ -115,49 +133,69 @@ export default class Controls {
                 [0, 1, translationY],
                 [0, 0, 1],
             ]
-            let S1: number[][] = [
-                [controls.view.scale, 0, 0],
-                [0, controls.view.scale, 0],
-                [0, 0, 1],
-            ]
-            let T2: number[][] = [
-                [1, 0, -translationX],
-                [0, 1, -translationY],
-                [0, 0, 1],
-            ]
+            // let S1: number[][] = [
+            // [controls.view.scale, 0, 0],
+            // [0, controls.view.scale, 0],
+            // [0, 0, 1],
+            // ]
+            // let T2: number[][] = [
+            // [1, 0, -translationX],
+            // [0, 1, -translationY],
+            // [0, 0, 1],
+            // ]
 
             let M1: number[][] = multiplyMatrices(M0, T1)
-            let M2: number[][] = multiplyMatrices(M1, S1)
-            let MX: number[][] = multiplyMatrices(M2, T2)
+            // let M2: number[][] = multiplyMatrices(M1, S1)
+            // let MX: number[][] = multiplyMatrices(M2, T2)
 
-            console.log(`T1:
-                ${T1[0]}
-                ${T1[1]}
-                ${T1[2]}`)
-            console.log(`S1:
-                ${S1[0]}
-                ${S1[1]}
-                ${S1[2]}`)
-            console.log(`T2:
-                ${T2[0]}
-                ${T2[1]}
-                ${T2[2]}`)
+            // console.log(`T1:
+            //     ${T1[0]}
+            //     ${T1[1]}
+            //     ${T1[2]}`)
+            // console.log(`S1:
+            //     ${S1[0]}
+            //     ${S1[1]}
+            //     ${S1[2]}`)
+            // console.log(`T2:
+            //     ${T2[0]}
+            //     ${T2[1]}
+            //     ${T2[2]}`)
 
-            let MXprint: number[][] = MX.map((row) =>
-                row.map((number) => Math.round(number * 10) / 10)
-            )
+            // console.log(`M1:
+            //     ${M1[0]}
+            //     ${M1[1]}
+            //     ${M1[2]}`)
+            // console.log(`M2:
+            //     ${M2[0]}
+            //     ${M2[1]}
+            //     ${M2[2]}`)
+            // console.log(`MX:
+            //     ${MX[0]}
+            //     ${MX[1]}
+            //     ${MX[2]}`)
 
-            console.log(`MX:
-                ${MXprint[0]}
-                ${MXprint[1]}
-                ${MXprint[2]}`)
+            // let MXprint: number[][] = MX.map((row) =>
+            //     row.map((number) => Math.round(number * 10) / 10)
+            // )
 
-            controls.view.affineTranslation = MX
+            // console.log(`MX:
+            //     ${MXprint[0]}
+            //     ${MXprint[1]}
+            //     ${MXprint[2]}`)
+
+            controls.view.affineTranslation = M1
 
             return
         }
 
         function touchEnded(e: TouchEvent) {}
+
+        function resetTouches(e: TouchEvent) {
+            if (!e.touches) return
+            totalInitialTouches = e.touches.length
+            initialTouches = e.touches
+            M0 = controls.view.affineTranslation
+        }
 
         function midpoint(touches: TouchList) {
             let [t0, t1] = touches
