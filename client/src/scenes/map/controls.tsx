@@ -109,37 +109,35 @@ export default class Controls {
             //
             //  Single Finger Touch - Translate Controls
             //
-            if (e.touches.length === 1) {
-                debug(`1 finger touch`)
+            // if (e.touches.length === 1) {
+            //     debug(`1 finger touch`)
 
-                translationX =
-                    e.touches[0].clientX - initialTouches.touches[0].clientX
-                translationY =
-                    e.touches[0].clientY - initialTouches.touches[0].clientY
+            //     translationX =
+            //         e.touches[0].clientX - initialTouches.touches[0].clientX
+            //     translationY =
+            //         e.touches[0].clientY - initialTouches.touches[0].clientY
 
-                translationX = translationX * IM[0][0] + IM[0][2]
-                translationY = translationY * IM[0][0] + IM[1][2]
+            //     translationX = translationX * IM[0][0] + IM[0][2]
+            //     translationY = translationY * IM[0][0] + IM[1][2]
 
-                let MT: number[][] = [
-                    [1, 0, translationX],
-                    [0, 1, translationY],
-                    [0, 0, 1],
-                ]
+            //     let MT: number[][] = [
+            //         [1, 0, translationX],
+            //         [0, 1, translationY],
+            //         [0, 0, 1],
+            //     ]
 
-                M0 = multiplyMatrices(M0, MT)
+            //     M0 = multiplyMatrices(M0, MT)
 
-                debug(`1 finger translation:
-                ${M0[0]}
-                ${M0[1]}
-                ${M0[2]}`)
-            }
+            //     debug(`1 finger translation:
+            //     ${M0[0]}
+            //     ${M0[1]}
+            //     ${M0[2]}`)
+            // }
             //
             //  Double Finger Touch - Translate Controls
             //
             if (e.touches.length === 2) {
                 debug(`2 finger touch`)
-
-                M0 = controls.view.affineTranslation
 
                 // translationX =
                 //     midpoint(e.touches[0].clientX, e.touches[1].clientX) -
@@ -164,11 +162,6 @@ export default class Controls {
                 // ]
 
                 // M0 = multiplyMatrices(M0, MT)
-
-                debug(`2 finger translation:
-                ${M0[0]}
-                ${M0[1]}
-                ${M0[2]}`)
 
                 controls.view.scale =
                     distance(
@@ -223,43 +216,6 @@ export default class Controls {
                 MS = multiplyMatrices(MS, S1)
                 MS = multiplyMatrices(MS, T2)
 
-                {
-                    console.log(`T1:
-                ${T1[0]}
-                ${T1[1]}
-                ${T1[2]}`)
-                    console.log(`S1:
-                ${S1[0]}
-                ${S1[1]}
-                ${S1[2]}`)
-                    console.log(`T2:
-                ${T2[0]}
-                ${T2[1]}
-                ${T2[2]}`)
-
-                    //     console.log(`M1:
-                    // ${M1[0]}
-                    // ${M1[1]}
-                    // ${M1[2]}`)
-                    //     console.log(`M2:
-                    // ${M2[0]}
-                    // ${M2[1]}
-                    // ${M2[2]}`)
-                    //     console.log(`MX:
-                    // ${MX[0]}
-                    // ${MX[1]}
-                    // ${MX[2]}`)
-                }
-
-                let MXprint: number[][] = M0.map((row) =>
-                    row.map((number) => Math.round(number * 10) / 10)
-                )
-
-                console.log(`M:
-                ${MXprint[0]}
-                ${MXprint[1]}
-                ${MXprint[2]}`)
-
                 controls.view.affineTranslation = MS
 
                 return
@@ -268,6 +224,14 @@ export default class Controls {
 
         function touchEnded(e: TouchEvent) {}
 
+        const printMatrix = (M: number[][], name: string) => {
+            // Prints a 3x3 matrix to console.
+            if (M.length !== 3 || M[0].length !== 3) return
+            console.log(`${name}:
+                    ${M[0]}
+                    ${M[1]}
+                    ${M[2]}`)
+        }
         function midpoint(point0: number, point1: number) {
             // Midpoint of two point on the same axis.
             return (point0 + point1) / 2
