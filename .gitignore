@@ -11,3 +11,10 @@ server/node_modules
 #
 
 client/node_modules
+
+#
+#   data
+#
+
+data/aurigny_tracker.db
+data/aurigny_tracker.log
