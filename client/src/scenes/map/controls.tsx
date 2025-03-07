@@ -90,16 +90,10 @@ export default class Controls {
             ) {
                 return
             }
-            M0 = controls.view.affineTranslation
             IM = inverseAffineMatrix(controls.view.affineTranslation)
             if (!IM) return
-            debug(`IM:
-                ${IM[0]}
-                ${IM[1]}
-                ${IM[2]}`)
 
-            let translationX: number = 0
-            let translationY: number = 0
+            printMatrix(IM, `Inverse Matrix`)
 
             if (e.touches.length !== totalInitialTouches) {
                 debug(`Change in number of touches`)
@@ -109,59 +103,52 @@ export default class Controls {
             //
             //  Single Finger Touch - Translate Controls
             //
-            // if (e.touches.length === 1) {
-            //     debug(`1 finger touch`)
+            if (e.touches.length === 1) {
+                debug(`1 finger touch`)
 
-            //     translationX =
-            //         e.touches[0].clientX - initialTouches.touches[0].clientX
-            //     translationY =
-            //         e.touches[0].clientY - initialTouches.touches[0].clientY
+                //
+                //   Translation values from screen pixels
+                //
+                let translationX: number = 0
+                let translationY: number = 0
 
-            //     translationX = translationX * IM[0][0] + IM[0][2]
-            //     translationY = translationY * IM[0][0] + IM[1][2]
+                translationX =
+                    e.touches[0].clientX - initialTouches.touches[0].clientX
+                translationY =
+                    e.touches[0].clientY - initialTouches.touches[0].clientY
 
-            //     let MT: number[][] = [
-            //         [1, 0, translationX],
-            //         [0, 1, translationY],
-            //         [0, 0, 1],
-            //     ]
+                console.log(
+                    `IM00 IM02 TranslateX ${IM[0][0]}, ${IM[0][2]}, ${translationX}`
+                )
+                //
+                //   Translation values converted to match existing panning and scaling
+                //
+                // translationX = translationX + IM[0][2]
+                //* IM[0][0]
+                // translationY = translationY + IM[1][2]
+                //* IM[0][0]
 
-            //     M0 = multiplyMatrices(M0, MT)
+                let MT: number[][] = [
+                    [1, 0, translationX],
+                    [0, 1, translationY],
+                    [0, 0, 1],
+                ]
 
-            //     debug(`1 finger translation:
-            //     ${M0[0]}
-            //     ${M0[1]}
-            //     ${M0[2]}`)
-            // }
+                printMatrix(MT, `1 finger MT`)
+
+                MS = multiplyMatrices(M0, MT)
+
+                printMatrix(MS, '1 finger M0')
+
+                controls.view.affineTranslation = MS
+
+                return
+            }
             //
             //  Double Finger Touch - Translate Controls
             //
             if (e.touches.length === 2) {
                 debug(`2 finger touch`)
-
-                // translationX =
-                //     midpoint(e.touches[0].clientX, e.touches[1].clientX) -
-                //     midpoint(
-                //         initialTouches.touches[0].clientX,
-                //         initialTouches.touches[1].clientX
-                //     )
-                // translationY =
-                //     midpoint(e.touches[0].clientY, e.touches[1].clientY) -
-                //     midpoint(
-                //         initialTouches.touches[0].clientY,
-                //         initialTouches.touches[1].clientY
-                //     )
-
-                // translationX = translationX * IM[0][0] + IM[0][2]
-                // translationY = translationY * IM[0][0] + IM[1][2]
-
-                // let MT: number[][] = [
-                //     [1, 0, translationX],
-                //     [0, 1, translationY],
-                //     [0, 0, 1],
-                // ]
-
-                // M0 = multiplyMatrices(M0, MT)
 
                 controls.view.scale =
                     distance(
@@ -191,6 +178,9 @@ export default class Controls {
                     initialTouches.touches[1].clientY
                 )
 
+                debug(
+                    `midpoint of initial touches: (${scaleTranslationX},${scaleTranslationY}`
+                )
                 scaleTranslationX = scaleTranslationX * IM[0][0] + IM[0][2]
                 scaleTranslationY = scaleTranslationY * IM[0][0] + IM[1][2]
 
@@ -215,6 +205,30 @@ export default class Controls {
                 MS = multiplyMatrices(MS, T1)
                 MS = multiplyMatrices(MS, S1)
                 MS = multiplyMatrices(MS, T2)
+
+                // translationX =
+                //     midpoint(e.touches[0].clientX, e.touches[1].clientX) -
+                //     midpoint(
+                //         initialTouches.touches[0].clientX,
+                //         initialTouches.touches[1].clientX
+                //     )
+                // translationY =
+                //     midpoint(e.touches[0].clientY, e.touches[1].clientY) -
+                //     midpoint(
+                //         initialTouches.touches[0].clientY,
+                //         initialTouches.touches[1].clientY
+                //     )
+
+                // translationX = translationX * IM[0][0] + IM[0][2]
+                // translationY = translationY * IM[0][0] + IM[1][2]
+
+                // let MT: number[][] = [
+                //     [1, 0, translationX],
+                //     [0, 1, translationY],
+                //     [0, 0, 1],
+                // ]
+
+                // MS = multiplyMatrices(MS, MT)
 
                 controls.view.affineTranslation = MS
 
