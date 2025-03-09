@@ -1,18 +1,17 @@
 services:
-  
   server:
     build:
       context: ./server
       dockerfile: Dockerfile
-    volumes: 
-    # - ./server:/workspace
-    - ./data:/workspace/data
-    - /workspace/node_modules
+    volumes:
+      # - ./server:/workspace
+      - ./data:/workspace/data
+      - /workspace/node_modules
     ports:
       - "3000:3000"
     develop:
       watch:
-        - path: ./server 
+        - path: ./server
           target: /workspace
           action: sync
         - path: ./server/package.json
@@ -22,16 +21,16 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
-    volumes: 
-    # - ./client:/workspace
-    - /workspace/node_modules
+    volumes:
+      # - ./client:/workspace
+      - /workspace/node_modules
     ports:
       - "5000:5000"
     depends_on:
       - server
     develop:
       watch:
-        - path: ./client 
+        - path: ./client
           target: /workspace
           action: sync
         - path: ./client/package.json
